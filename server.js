@@ -1,36 +1,47 @@
-// Import required packages
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config(); // Load environment variables from .env file
-
-// Import your database connection
+require('dotenv').config();
 const db = require('./config/database');
 
-// Initialize Express app
+// Import routes
+const authRoutes = require('./routes/auth');
+
 const app = express();
 
-// Middleware - allow JSON requests and CORS
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-// Test route to verify server is running
+// Test database connection
+db.query('SELECT NOW()', (err, result) => {
+  if (err) {
+    console.error('❌ Database connection failed:', err.message);
+  } else {
+    console.log('✅ Database connected:', result.rows[0]);
+  }
+});
+
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Backend is running!' });
 });
 
-// Routes (we'll add these next)
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/inventory', require('./routes/inventory'));
-// app.use('/api/orders', require('./routes/orders'));
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json({ error: 'Something went wrong' });
 });
 
-// Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error(`❌ Could not start server on port ${PORT}:`, error.message);
+    process.exit(1);
+  }
   console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`📝 Register: POST http://localhost:${PORT}/api/auth/register`);
+  console.log(`🔓 Login: POST http://localhost:${PORT}/api/auth/login`);
 });
