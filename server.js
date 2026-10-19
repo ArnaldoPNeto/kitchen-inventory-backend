@@ -5,6 +5,7 @@ const db = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const inventoryRoutes = require('./routes/inventory');
 
 const app = express();
 
@@ -28,6 +29,9 @@ app.get('/api/health', (req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Inventory routes
+app.use('/api/inventory', inventoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

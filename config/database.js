@@ -1,5 +1,8 @@
 // Import PostgreSQL client
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
+
+// Return NUMERIC columns (quantity, unit_cost...) as JS numbers instead of strings
+types.setTypeParser(1700, (value) => parseFloat(value));
 require('dotenv').config();
 
 // Create connection pool to PostgreSQL database
